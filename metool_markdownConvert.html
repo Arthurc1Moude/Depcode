@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>document</title>
+  <link rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/5.5.1/github-markdown-light.min.css">
+  <link rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/11.9.0/styles/github.min.css">
+  <link rel="stylesheet" href="https://cdn.staticfile.org/KaTeX/0.16.9/katex.min.css">
+  <style>
+    body { margin: 0; padding: 2rem; background: #ffffff; }
+    .markdown-body { max-width: 860px; margin: 0 auto; box-sizing: border-box; }
+    .markdown-body pre { padding: 0; }
+    .markdown-body pre > code.hljs { border-radius: 6px; padding: 1em; }
+    .markdown-body code:not(pre code) { padding: .2em .4em; border-radius: 4px; font-size: 85%; }
+    .mermaid { text-align: center; margin: 1.5em 0; }
+    .katex-display { overflow-x: auto; overflow-y: hidden; }
+  </style>
+</head>
+<body>
+  <article id="md-content" class="markdown-body"></article>
+
+  <script src="https://cdn.staticfile.org/marked/12.0.2/marked.min.js"></script>
+  <script src="https://cdn.staticfile.org/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.staticfile.org/mermaid/10.9.3/mermaid.min.js"></script>
+  <script src="https://cdn.staticfile.org/KaTeX/0.16.9/katex.min.js"></script>
+  <script src="https://cdn.staticfile.org/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+  <script>
+    (async function () {
+      var raw = `# 开发报告
+本次开发预计**2时12分**，主要专注于以下内容：
+- 修复页面点击闪退问题
+- 编辑资料功能完整可用
+- 发布功能支持图片、GIF、视频多种内容，增加投票、长文编辑，可设置标题、加粗、自定义字体，兼容类 Markdown，编辑体验对标 Word、WPS
+- 选择话题弹出独立窗口，顶部固定搜索栏，下方展示话题列表；无匹配话题时保留输入内容并提供新建话题入口
+- 调整评论回复展示层级，回复字号偏小排列在对应评论下方，默认展示 1 条回复，多余内容折叠配展开按钮；首次展开加载 50 条，再次展开加载 100 条，最后展开加载全部回复
+- 调整个人主页布局，下移编辑资料按钮解决被背景遮挡问题，背景图放置底层保证头像完整展示
+- 个人主页背景添加柔和内阴影，区分背景图层与上层界面元素
+- 设置页面所有按钮接入真实功能逻辑，完善剩余按钮能力，保留 VIP、兑换码可用功能
+增加分享功能，个人主页链接格式，帖子链接格式...
+- 帖子唯一编号由服务端生成并持久存储，分享链接固定不变
+- Vercel、Render 平台部署配置流程同步对接确认后完成搭建
+- 开启本地存储，草稿、登录信息本地留存；已发布帖子、用户主页、账号相关数据云端存储，登录注册自动同步云端数据
+- 支持自建群聊，可邀请互关好友，支持群码、好友邀请两种入群方式，入群双方需互相关注
+- 双人聊天仅双方互关即可使用
+- 其他用户主页配备关注按钮，点击切换为已关注状态，再次点击弹出取关确认弹窗，取关后可再次发起关注
+- 双向互关时按钮显示已互关；对方单方取消关注，页面显示已关注；自身取消关注对方，页面显示关注
+- 存在黑名单关联时隐藏关注操作入口
+- 其他用户主页发消息按钮仅双向互关状态展示
+- Web 端全部功能完整落地，功能效果与安卓端保持一致
+
+以上为今日更新前的所有内容，可在 Depcode Portal 中进一步了解本次开发进程与状态。`;
+
+      // Render markdown to HTML
+      document.getElementById('md-content').innerHTML = marked.parse(raw);
+
+      // Render LaTeX (before hljs so math in code blocks stays intact)
+      renderMathInElement(document.getElementById('md-content'), {
+        delimiters: [
+          { left: '$$',   right: '$$',   display: true  },
+          { left: '$',    right: '$',    display: false },
+          { left: '\\[', right: '\\]', display: true  },
+          { left: '\\(', right: '\\)', display: false },
+        ],
+        throwOnError: false,
+      });
+
+      // Syntax-highlight code blocks (skip mermaid)
+      document.querySelectorAll('pre code').forEach(function (el) {
+        if (el.classList.contains('language-mermaid')) return;
+        hljs.highlightElement(el);
+      });
+
+      // Convert ```mermaid blocks to <div class="mermaid"> and render
+      var mermaidNodes = [];
+      document.querySelectorAll('pre code.language-mermaid').forEach(function (el) {
+        var div = document.createElement('div');
+        div.className = 'mermaid';
+        div.textContent = el.textContent || '';
+        el.closest('pre').replaceWith(div);
+        mermaidNodes.push(div);
+      });
+
+      if (mermaidNodes.length) {
+        mermaid.initialize({ startOnLoad: false, theme: 'default' });
+        try { await mermaid.run({ nodes: mermaidNodes }); }
+        catch (e) { console.warn('mermaid render error', e); }
+      }
+    })();
+  </script>
+</body>
+</html>
